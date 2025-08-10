@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  load-balancer:
+    build: ./lb-server
+    ports:
+      - "8080:8080"
+    depends_on:
+      - edge-server
+    environment:
+      - EDGE_SERVERS=edge-server:8081
+
+  # Cached server
+  edge-server:
+    build: ./edge-server
+    ports:
+      - "8081:8081"
+    depends_on:
+      - origin-server
+    environment:
+      - ORIGIN_URL=http://origin-server:3000
+
+  # original content server
+  origin-server:
+    build: ./origin-server
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./content:/app/content
